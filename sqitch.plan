@@ -2,3 +2,5 @@
 %project=monitor-db
 %uri=https://github.com/sqitchers/sqitch-intro/
 
+appschema 2020-06-14T13:21:07Z Thomas Uebermeier <thomas@februus.net> # monitor schema
+checks [appschema] 2020-06-14T14:06:52Z Thomas Uebermeier <thomas@februus.net> # monitoring table.
