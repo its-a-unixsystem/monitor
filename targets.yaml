@@ -7,4 +7,4 @@ BBC:
     regex: ~
 yahoo:
     host: https://de.yahoo.com/topics/Coronavirus/
-    regex: yahoo
+    regex: ^foo.*[1]
