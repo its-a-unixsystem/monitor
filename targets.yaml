@@ -1,0 +1,10 @@
+---
+google:
+    host: www.google.com
+    regex: text
+BBC:
+    host: www.bbc.co.uk
+    regex: ~
+yahoo:
+    host: www.yahoo.com
+    regex: yahoo
