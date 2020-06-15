@@ -22,8 +22,10 @@ It has 2 config files:
 `bin/kafka-topics --bootstrap-server $SERVER --create --topic monitor --replication-factor 1 --partitions 2`
 1. create the database schema. You can either install squitch and use the supplied squitch files via: `sqitch deploy --verify db:pg:monitor` or create the single table manually, by running:
 `psql -U $USER -d monitor -a -f deploy/checks.sql"
-1. start the consumer via python3 
+1. start the consumer via `python3 consumtodb.py`
+1. start on another console the checker via `python3 monitor.py`
 
+#Configuration
 
 ## config.ini
 
@@ -60,10 +62,13 @@ list = targets.yaml
 
 ## targets.yaml
 
-This file contains the webpages which could be checked. Each entry can also have a regex (https://docs.python.org/2/library/re.html) which is being checked on the page and the hits are being counted.
+This file contains the webpages which could be checked. Each entry can also have a regex which is being checked on the page and the hits are being counted. It starts with three dashes and needs to be YAML conform:
 
 ```
 ---
+NAME:
+    host: HOSTNAME/PATH
+    regex: SOMETHING
 google:
     host: www.google.com
     regex: text
@@ -74,3 +79,29 @@ yahoo:
     host: www.yahoo.com
     regex: yahoo
 ```
+*NAME* is a name you can give to this check, like 'blogpage' or similar, it cannot contain whitespaces, can be up to 255 characters long
+*host* the URL to the page, if it does not contain an URI like `http` or `https` then `https://` is automatically added. Can be maximum 255 characters long
+*regex* see https://docs.python.org/2/library/re.html for regex rules, if no search should be performed, you need to add a tilde (~) character instead
+
+# Database output
+
+The result table contains the following columns:
+```
+    name      varchar(255) NOT NULL,
+    host      varchar(255) NOT NULL,
+    checktime timestamp NOT NULL,
+    response_time integer,
+    regex_hits integer,
+    regex varchar(255),
+    return_code smallint
+```
+
+Table name | explanation
+-----------|------------
+*name* | choosen name for the check
+*host* | host/path for the check
+checktime | Postgres timestamp UTC normalized
+response time | the response time of the page in miliseconds*1000
+regex_hits | how many times the regex was encountered on thet page
+regex | which regex was used
+return_code | HTTP return code of that page

@@ -6,5 +6,5 @@ BBC:
     host: www.bbc.co.uk
     regex: ~
 yahoo:
-    host: www.yahoo.com
+    host: https://de.yahoo.com/topics/Coronavirus/
     regex: yahoo
