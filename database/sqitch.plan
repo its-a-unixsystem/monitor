@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=monitor-db
+%uri=https://github.com/sqitchers/sqitch-intro/
+
+appschema 2020-06-14T13:21:07Z Thomas Uebermeier <thomas@februus.net> # monitor schema
+checks [appschema] 2020-06-14T14:06:52Z Thomas Uebermeier <thomas@februus.net> # monitoring table.
+@v1.0 2020-06-15T15:37:57Z Thomas Uebermeier <thomas@februus.net> # Tag v1.0
