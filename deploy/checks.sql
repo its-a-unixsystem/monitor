@@ -12,4 +12,7 @@ CREATE TABLE monitor.checks (
     regex varchar(255),
     return_code smallint
 );
+create index idx_name on monitor.checks (name);
+create index idx_checktime on monitor.checks (checktime);
+
 COMMIT;
