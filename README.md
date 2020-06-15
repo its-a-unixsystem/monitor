@@ -9,9 +9,10 @@ It has 2 config files:
 # requirements
 
 1. a system to run the checks
-    1. software needed: python3 with the modules psycopg2 and python3-kafka https://kafka-python.readthedocs.io, which is packaged as `python3-kafka` on Debian/Ubuntu
-1. Postgres database with the schema 'monitor' and a user to access this schema.
-1. running Kafka system (tested against v2.5 other might work as well)
+    1. software needed: python3 with the modules [psycopg2](https://pypi.org/project/psycopg2/) and [python3-kafka](https://kafka-python.readthedocs.io), 
+    1. The packages are available as `python3-kafka` `python3-psycopg2` on Debian/Ubuntu, you can install those packages via `sudo apt install python3-kafka python3-psycopg2`
+1. Postgres database with the schema 'monitor' and a user to access this schema. Postgres tools for setting up the table are also needed. For Debian/Ubuntu do `sudo apt install postgresql-client`
+1. a running Kafka system (tested against v2.5 other versions might work as well)
 1. anoth system for the Kafka database consumer, can be the same as 1.
 
 # Quickstart
@@ -20,10 +21,11 @@ It has 2 config files:
 1. edit both config files (config.ini and targets.yaml) as described below
 1. create a topic (eg. 'monitor') on the kafka system. Depending on your expected amount of checks you might want to adjust the amount of partitions:
 `bin/kafka-topics --bootstrap-server $SERVER --create --topic monitor --replication-factor 1 --partitions 2`
-1. create the database schema. You can either install squitch and use the supplied squitch files via: `sqitch deploy --verify db:pg:monitor` or create the single table manually, by running:
-`psql -U $USER -d monitor -a -f deploy/checks.sql"
+1. create the database schema. You can either install the database migration tool [squitch](sqitch.org/) and use the supplied squitch files via: `sqitch deploy` or create the table manually, by running:
+`psql -U $USER -d monitor -a -f deploy/checks.sql`
 1. start the consumer via `python3 consumtodb.py`
-1. start on another console the checker via `python3 monitor.py`
+1. start on another console or system the checker via `python3 monitor.py`
+1. if the checker works as expected add it to a cron-job via `crontab -e` and configure it to run at a desired interval
 
 #Configuration
 
@@ -79,11 +81,12 @@ yahoo:
     host: www.yahoo.com
     regex: yahoo
 ```
-*NAME* is a name you can give to this check, like 'blogpage' or similar, it cannot contain whitespaces, can be up to 255 characters long
-*host* the URL to the page, if it does not contain an URI like `http` or `https` then `https://` is automatically added. Can be maximum 255 characters long
-*regex* see https://docs.python.org/2/library/re.html for regex rules, if no search should be performed, you need to add a tilde (~) character instead
+- *NAME* is a name you can give to this check, like 'blogpage' or similar, it cannot contain whitespaces, can be up to 255 characters long
+- *host* the URL to the page, if it does not contain an URI like `http` or `https` then `https://` is automatically added. Can be maximum 255 characters long
+- *regex* see https://docs.python.org/2/library/re.html for regex rules, if no search should be performed, you need to add a tilde (~) character instead
 
-# Database output
+# Database
+## format
 
 The result table contains the following columns:
 ```
@@ -98,10 +101,23 @@ The result table contains the following columns:
 
 Table name | explanation
 -----------|------------
-*name* | choosen name for the check
-*host* | host/path for the check
-checktime | Postgres timestamp UTC normalized
-response time | the response time of the page in miliseconds*1000
-regex_hits | how many times the regex was encountered on thet page
-regex | which regex was used
-return_code | HTTP return code of that page
+**name** | choosen name for the check
+**host** | host/path for the check
+**checktime** | Postgres timestamp UTC normalized
+**response time** | the response time of the page in miliseconds*1000
+**regex_hits** | how many times the regex was encountered on the page
+**regex** | which regex was used
+**return_code** | HTTP return code of that page
+
+## DB performance limitations
+there are so far two indexes on the table, on name and on checktime, as any output would filter on a date range as well as on certain checks. If different output is needed additonal indexes should be created to avoid table scans.
+
+# known limitations
+
+ Issue | Mitigation
+-------|-----------
+it is vulnerable to Kafka connection issues and will just exit|wrap it in a environment, that does restart it, eg. crontab for the checker and supervia/systemd for the consumer
+it is limited to one database|with indexes output should be sufficent fast, but app can not scale further
+the checker works serial and is too slow on many checks|start more than one with different targets.yaml
+I need to start mroe than one DB consumer| start the application several times with a different parameter `-i <number>`
+I need to have several instances with different configurations| you can use the parameter `-c <configuration-file.ini>`
