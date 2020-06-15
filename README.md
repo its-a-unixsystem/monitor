@@ -27,7 +27,7 @@ It has 2 config files:
 1. start on another console or system the checker via `python3 monitor.py`
 1. if the checker works as expected add it to a cron-job via `crontab -e` and configure it to run at a desired interval
 
-#Configuration
+# Configuration
 
 ## config.ini
 
