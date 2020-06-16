@@ -19,15 +19,19 @@ It has 2 config files:
 
 # Quickstart
 
-1. Check out the repo
-1. edit both config files (config.ini and targets.yaml) as described below
+1. check both config files (config.ini and targets.yaml) as described below.
 1. create a topic (eg. 'monitor') on the kafka system. Depending on your expected amount of checks you might want to adjust the amount of partitions:
 `bin/kafka-topics --bootstrap-server $SERVER --create --topic monitor --replication-factor 1 --partitions 2`
-1. create the database schema. You can either install the database migration tool [squitch](sqitch.org/) and use the supplied squitch files via: `sqitch deploy` or create the table manually, by running:
+1. create the database. You can either install the database migration tool [squitch](sqitch.org/) and use the supplied squitch files via: `sqitch deploy` or create the table manually, by running:
 `psql -U $USER -d monitor -a -f deploy/checks.sql`
-1. start the consumer via `python3 consumtodb.py`
-1. start on another console or system the checker via `python3 monitor.py`
-1. if the checker works as expected add it to a cron-job via `crontab -e` and configure it to run at a desired interval
+1. start the consumer via `python3 consumtodb.py` and on another console / system the checker via `python3 monitor.py`
+
+# Long-term Setup
+1. if the checker works as expected add it to a cron-job via `crontab -e` and configure it to run at a desired interval:
+```
+*/5 * * * * checker.py
+```
+1. the consumer can be used as a systemd service or via tools like [restartd](https://packages.debian.org/unstable/utils/restartd),  [runit](http://smarden.org/runit/) or [daemon](http://www.libslack.org/daemon/)
 
 # Configuration
 
@@ -112,13 +116,13 @@ Table name | explanation
 **return_code** | HTTP return code of that page
 
 ## check failures
-If connecting to the host either times out or is unreachable, it sets the `return_code` to `999`
+If connecting to a host times out or is unreachable, `return_code` is set to `999`
 
 ## DB performance limitations
 there are so far two indexes on the table, on name and on checktime, as any output would filter on a date range as well as on certain checks. If different output is needed additonal indexes should be created to avoid table scans.
 
 # Tests
-* The tests need pytest.
+* The tests need pytest. Install it via `pip3 install pytest`
 * It is expected that you have a configured Postgres as well as Kafka system, which is accessible and a working config.ini with the connection parameters.
 * start the tests - ideally in a virtual environment - via `pytest-3 --pyargs monitor`
 
@@ -129,6 +133,6 @@ there are so far two indexes on the table, on name and on checktime, as any outp
 it is vulnerable to Kafka connection issues and will just exit|wrap it in a environment, that does restart it, eg. crontab for the checker and supervia/systemd for the consumer
 it is limited to one database|with indexes output should be sufficent fast, but app can not scale further
 the checker works serial and is too slow on many checks|start more than one with different targets.yaml
-I need to start mroe than one DB consumer| start the application several times with a different parameter `-i <number>`
+I need to start more than one DB consumer| start the application several times with a different parameter `-i <number>`
 I need to have several instances with different configurations| you can use the parameter `-c <configuration-file.ini>`
 I need to check a site that needs authentication/cookies/etc| This is not implemented, sorry
