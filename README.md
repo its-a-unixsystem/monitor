@@ -24,7 +24,7 @@ It has 2 config files:
 `bin/kafka-topics --bootstrap-server $SERVER --create --topic monitor --replication-factor 1 --partitions 2`
 1. create the database. You can either install the database migration tool [squitch](sqitch.org/) and use the supplied squitch files via: `sqitch deploy` or create the table manually, by running:
 `psql -U $USER -d monitor -a -f deploy/checks.sql`
-1. start the consumer via `python3 consumtodb.py` and on another console / system the checker via `python3 monitor.py`
+1. start the consumer via `python3 consumtodb.py` and on another console / system the checker via `python3 checker.py`
 
 # Long-term Setup
 1. if the checker works as expected add it to a cron-job via `crontab -e` and configure it to run at a desired interval:
