@@ -30,6 +30,7 @@ def connect_kafka(conf):
         m.error_print("can't connect to Kafka - please check the configuration")
         sys.exit(1)
 
+    # we check if the topic is already setup
     if conf.kafka_topic not in KafkaClient.topics():
         m.error_print("The Kafka cluster does not have the topic \"" + conf.kafka_topic
                       + "\". Please add it or change the config.")
@@ -58,8 +59,6 @@ def connect_kafka(conf):
 
 def check_host(target, conf):
     "take Target object and check"
-
-    m.if_debug_print("check_host called for {}".format(target.name), conf)
 
     # record the time when we do the check
     target.checktime = int(datetime.datetime.utcnow().timestamp())

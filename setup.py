@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="monitor-pkg-thomas-uebermeier",
-    version="0.9.1",
+    version="0.9.3",
     author="Thomas Uebermeier",
     author_email="thomas@februus.net",
     description="Website monitor",
