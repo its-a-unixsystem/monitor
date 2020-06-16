@@ -1,0 +1,10 @@
+[Unit]
+Description=Website Monitor - Consumer
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /usr/bin/consumtodb.py -c /usr/local/etc/config.ini
+
+[Install]
+WantedBy=multi-user.target

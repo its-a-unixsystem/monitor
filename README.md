@@ -31,7 +31,9 @@ It has 2 config files:
 ```
 */5 * * * * checker.py
 ```
-1. the consumer can be used as a systemd service or via tools like [restartd](https://packages.debian.org/unstable/utils/restartd),  [runit](http://smarden.org/runit/) or [daemon](http://www.libslack.org/daemon/)
+1. the consumer can be used as a systemd service or via tools like [restartd](https://packages.debian.org/unstable/utils/restartd),  [runit](http://smarden.org/runit/) or [daemon](http://www.libslack.org/daemon/).
+For systemd use the `consumer.service` file, modify it and save it in `/lib/systemd/system/` then reload and start the config: `sudo systemctl daemon-reload; sudo systemctl start consumer.service`
+
 
 # Configuration
 
