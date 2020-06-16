@@ -13,7 +13,7 @@ from kafka import KafkaProducer
 from kafka import KafkaConsumer
 
 # the common functions for both apps
-import monitorshared as m
+import monitor.monitorshared as m
 
 def connect_kafka(conf):
     "connect to the kafka cluster"
@@ -62,8 +62,26 @@ def check_host(target, conf):
         target.host = 'https://'+target.host
 
     # do the check
-    http_request = requests.get(target.host)
-    
+    # TODO: we set the timeout to 2 seconds, should be a per-host/config setting?
+    try:
+        http_request = requests.get(target.host, timeout=2)
+
+    except requests.Timeout:
+        target.return_code = 999
+        target.response_time = 0
+        m.if_debug_print("checking {} times out".format(target.host), conf)
+        return
+    except requests.ConnectionError:
+        target.return_code = 999
+        target.response_time = 0
+        m.if_debug_print("Connection error checking {}".format(target.host), conf)
+        return
+    except:
+        target.return_code = 999
+        target.response_time = 0
+        m.if_debug_print("Error checking {}".format(target.host), conf)
+        return
+
     target.return_code = http_request.status_code
 
     # convert the miliseconds into int

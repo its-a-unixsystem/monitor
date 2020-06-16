@@ -6,7 +6,7 @@ import json
 from kafka import KafkaConsumer
 import psycopg2
 
-import monitorshared as m
+import monitor.monitorshared as m
 
 def connect_db(conf):
     "connect to Postgres"
@@ -42,7 +42,7 @@ def connect_kafka(conf, client_num):
 
     return handle
 
-def main(argv=None):
+def main(argv):
     "main"
 
     client_num = 1
