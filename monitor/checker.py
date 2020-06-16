@@ -19,12 +19,16 @@ def connect_kafka(conf):
     "connect to the kafka cluster"
 
     # first we need to check if the cluster has the topic setup
-    KafkaClient = KafkaConsumer(bootstrap_servers=conf.kafka_broker,
-                                security_protocol="SSL",
-                                ssl_cafile=conf.kafka_SSL_CA,
-                                ssl_certfile=conf.kafka_SSL_cert,
-                                ssl_keyfile=conf.kafka_SSL_key,
-                                )
+    try:
+        KafkaClient = KafkaConsumer(bootstrap_servers=conf.kafka_broker,
+                                    security_protocol="SSL",
+                                    ssl_cafile=conf.kafka_SSL_CA,
+                                    ssl_certfile=conf.kafka_SSL_cert,
+                                    ssl_keyfile=conf.kafka_SSL_key,
+                                    )
+    except:
+        m.error_print("can't connect to Kafka - please check the configuration")
+        sys.exit(1)
 
     if conf.kafka_topic not in KafkaClient.topics():
         m.error_print("The Kafka cluster does not have the topic \"" + conf.kafka_topic
@@ -35,14 +39,18 @@ def connect_kafka(conf):
 
     # found on https://help.aiven.io/en/articles/489572-getting-started-with-aiven-kafka ;-)
     # https://github.com/msgpack/msgpack-python for serialization
-    KafkaProducerHandle = KafkaProducer(
-        bootstrap_servers=conf.kafka_broker,
-        security_protocol="SSL",
-        ssl_cafile=conf.kafka_SSL_CA,
-        ssl_certfile=conf.kafka_SSL_cert,
-        ssl_keyfile=conf.kafka_SSL_key,
-        value_serializer=lambda x: json.dumps(x).encode("utf-8"),
-    )
+    try:
+        KafkaProducerHandle = KafkaProducer(
+            bootstrap_servers=conf.kafka_broker,
+            security_protocol="SSL",
+            ssl_cafile=conf.kafka_SSL_CA,
+            ssl_certfile=conf.kafka_SSL_cert,
+            ssl_keyfile=conf.kafka_SSL_key,
+            value_serializer=lambda x: json.dumps(x).encode("utf-8"),
+        )
+    except:
+        m.error_print("can't connect to Kafka - please check the configuration")
+        sys.exit(1)
 
     m.if_debug_print("connected to kafka: {}".format(conf.kafka_broker), conf)
 

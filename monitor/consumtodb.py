@@ -10,33 +10,43 @@ import monitor.monitorshared as m
 
 def connect_db(conf):
     "connect to Postgres"
-    db_connection = psycopg2.connect(
-        database=conf.db_schema,
-        user=conf.db_user,
-        password=conf.db_passwd,
-        host=conf.db_host,
-        port=conf.db_port,
-    )
 
+    try:
+        db_connection = psycopg2.connect(
+            database=conf.db_schema,
+            user=conf.db_user,
+            password=conf.db_passwd,
+            host=conf.db_host,
+            port=conf.db_port,
+        )
+    except:
+        m.error_print("can't connect to DB - please check the configuration")
+        sys.exit(1)
+    
     m.if_debug_print("Database connected {}".format(conf.db_host), conf)
 
     return db_connection
 
 def connect_kafka(conf, client_num):
     "connect to Kafka"
-    handle = KafkaConsumer(
-        conf.kafka_topic,
-        auto_offset_reset="earliest",
-        enable_auto_commit=True,
-        bootstrap_servers=conf.kafka_broker,
-        security_protocol="SSL",
-        ssl_cafile=conf.kafka_SSL_CA,
-        ssl_certfile=conf.kafka_SSL_cert,
-        ssl_keyfile=conf.kafka_SSL_key,
-        client_id="postgres-client-"+str(client_num),
-        group_id="postgres-consumer",
-        value_deserializer=lambda x: json.loads(x).encode("utf-8"),
-    )
+
+    try:
+        handle = KafkaConsumer(
+            conf.kafka_topic,
+            auto_offset_reset="earliest",
+            enable_auto_commit=True,
+            bootstrap_servers=conf.kafka_broker,
+            security_protocol="SSL",
+            ssl_cafile=conf.kafka_SSL_CA,
+            ssl_certfile=conf.kafka_SSL_cert,
+            ssl_keyfile=conf.kafka_SSL_key,
+            client_id="postgres-client-"+str(client_num),
+            group_id="postgres-consumer",
+            value_deserializer=lambda x: json.loads(x).encode("utf-8"),
+        )
+    except:
+        m.error_print("can't connect to Kafka - please check the configuration")
+        sys.exit(1)
 
     m.if_debug_print("connected to kafka: {}".format(conf.kafka_broker), conf)
 

@@ -10,11 +10,12 @@ It has 2 config files:
 
 1. a system to run the checks
     1. software needed: python3 with the modules [psycopg2](https://pypi.org/project/psycopg2/) and [python3-kafka](https://kafka-python.readthedocs.io), 
-    1. The packages are available as `python3-kafka` `python3-psycopg2` on Debian/Ubuntu, you can install those packages via `sudo apt install python3-kafka python3-psycopg2`
-    1. the testing needs pytest, pytest-benchmark and pytest-cov (all python 3 versions)
+    1. The packages are available as `python3-kafka` `python3-psycopg2` on Debian/Ubuntu, you can install those packages via
+    `pip3 install wheel requests kafka pyyaml kafka-python psycopg2-binary`
+    1. the testing needs pytest3
 1. Postgres database with the schema 'monitor' and a user to access this schema. Postgres tools for setting up the table are also needed. For Debian/Ubuntu do `sudo apt install postgresql-client`
 1. a running Kafka system (tested against v2.5 other versions might work as well)
-1. anoth system for the Kafka database consumer, can be the same as 1.
+1. another system for the Kafka database consumer, can be the same as 1.
 
 # Quickstart
 
@@ -116,6 +117,11 @@ If connecting to the host either times out or is unreachable, it sets the `retur
 ## DB performance limitations
 there are so far two indexes on the table, on name and on checktime, as any output would filter on a date range as well as on certain checks. If different output is needed additonal indexes should be created to avoid table scans.
 
+# Tests
+* The tests need pytest.
+* It is expected that you have a configured Postgres as well as Kafka system, which is accessible and a working config.ini with the connection parameters.
+* start the tests - ideally in a virtual environment - via `pytest-3 --pyargs monitor`
+
 # known limitations
 
  Issue | Mitigation
@@ -125,4 +131,4 @@ it is limited to one database|with indexes output should be sufficent fast, but 
 the checker works serial and is too slow on many checks|start more than one with different targets.yaml
 I need to start mroe than one DB consumer| start the application several times with a different parameter `-i <number>`
 I need to have several instances with different configurations| you can use the parameter `-c <configuration-file.ini>`
-I need to check a site that need authentication/cookies/etc| not implemented, sorry
+I need to check a site that needs authentication/cookies/etc| This is not implemented, sorry
