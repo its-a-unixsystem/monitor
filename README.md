@@ -126,7 +126,7 @@ there are so far two indexes on the table, on name and on checktime, as any outp
 # Tests
 * The tests need pytest. Install it via `pip3 install pytest`
 * It is expected that you have a configured Postgres as well as Kafka system, which is accessible and a working config.ini with the connection parameters.
-* start the tests - ideally in a virtual environment - via `pytest-3 --pyargs monitor`
+* start the tests - ideally in a virtual environment - via `pytest-3` or `python3 -m pytest`
 
 # known limitations
 
