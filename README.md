@@ -23,7 +23,7 @@ It has 2 config files:
 1. create a topic (eg. 'monitor') on the kafka system. Depending on your expected amount of checks you might want to adjust the amount of partitions:
 `bin/kafka-topics --bootstrap-server $SERVER --create --topic monitor --replication-factor 1 --partitions 2`
 1. create the database. You can either install the database migration tool [squitch](sqitch.org/) and use the supplied squitch files via: `sqitch deploy` or create the table manually, by running:
-`psql -U $USER -d monitor -a -f deploy/checks.sql`
+`psql -U $USER -d monitor -a -f deploy/appschema.sql; psql -U $USER -d monitor -a -f deploy/checks.sql`
 1. start the consumer via `python3 consumtodb.py` and on another console / system the checker via `python3 checker.py`
 
 # Long-term Setup
@@ -112,7 +112,7 @@ Table name | explanation
 **name** | choosen name for the check
 **host** | host/path for the check
 **checktime** | Postgres timestamp UTC normalized
-**response time** | the response time of the page in microseconds*1000
+**response time** | the response time of the page in microseconds
 **regex_hits** | how many times the regex was encountered on the page
 **regex** | which regex was used
 **return_code** | HTTP return code of that page
